@@ -5,25 +5,25 @@
 %% get necessary data for data processing
 
 % set data paths
-datapaths = {'Digit_datap11.txt','Digit_datap21.txt'};
+datapaths = {'go1_leg_data.npz'};  % Go1: .npz file(s) from data collection
 
 % set the start time for each data file that is used
-cutTimeBefore = [5 5];
+cutTimeBefore = [0];   % set to 0 if data starts at t=0, else set trim time (s)
 
 % set the end time for each data file that is used
-cutTimeAfter = [10 14];
+cutTimeAfter = [30];   % trim data after this time (s) — adjust to your recording length
 
 % set the wished number of data points
 pointNumber = 2100;
 
 % set the cutoff frequency for torque for each data file that is used
-cfT = [33 33];
+cfT = [30];   % torque cutoff frequency (Hz) — tune based on Go1 noise profile
 
 % set the cutoff frequency for velocity for each data file that is used
-cfV = [18 18];
+cfV = [15];   % velocity cutoff frequency (Hz)
 
 % set the cutoff frequency for acceleration for each data file that is used
-cfA = [15 15];
+cfA = [10];   % acceleration cutoff frequency (Hz) — lower than cfV to reduce noise amplification
 
 % set the Butterworth filter order for torque
 orderT = 4;
@@ -39,8 +39,9 @@ orderA = 4;
 % this part is robot specific and has to be changed accordingly! 
 % specific parts which need to be changed depending on the robot and general parts which don't need to be changed are marked accordingly
 
-% specify the body part of digit (digit specific)
-bodypart = "LeftLeg";
+% specify the Go1 leg to identify (Go1 specific)
+% Options: 'FR' (front-right), 'FL' (front-left), 'RR' (rear-right), 'RL' (rear-left)
+leg = 'FR';
 
 % set variables for all data, if more than 1 data file is used (general part)
 i = 0;
@@ -53,8 +54,8 @@ q = [];
 % get the data for each file seperately and then connect them (general part)
 for k = 1:length(datapaths)
 
-    % run step 1 of digits file (digit specific, this part has to be changed with a new file according to the robot that is used)
-    [time,pos,vel,torque,J,na_idx,nu_idx,~,~,~,~] = SysIDDigit(datapaths{k},bodypart,1,[],[],[],[],[],constraintVariant);
+    % run step 1 of Go1 file (Go1 specific)
+    [time,pos,vel,torque,J,na_idx,nu_idx,~,~,~,~] = SysIDGo1(datapaths{k},leg,1,[],[],[],[],[],constraintVariant);
     
     % process the obtained raw data (general part)
     [i_,t_,q_,qdot_,qddot_,torq_] = dataProcessing(time,pos,vel,torque,cfT(k),cfV(k),cfA(k),cutTimeBefore(k),cutTimeAfter(k),orderT,orderV,orderA,pointNumber);
@@ -69,5 +70,5 @@ for k = 1:length(datapaths)
 
 end
 
-% run step 2 of digits file (digit specific, this part has to be changed with a new file according to the robot that is used)
-[~,~,~,~,~,~,~,W_ip,T,data,dataFull] = SysIDDigit(datapaths,bodypart,2,q,qdot,qddot,torq,i,constraintVariant);
+% run step 2 of Go1 file (Go1 specific)
+[~,~,~,~,~,~,~,W_ip,T,data,dataFull] = SysIDGo1(datapaths,leg,2,q,qdot,qddot,torq,i,constraintVariant);
