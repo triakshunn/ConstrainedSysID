@@ -468,7 +468,7 @@
     </collision>
   </link>
   <joint name="1_FR_hip_joint" type="revolute">
-    <origin rpy="0 0 0" xyz="0.1881 -0.04675 0"/>
+    <origin rpy="0 0 0" xyz="0.1881 -0.04675 0"/>        
     <parent link="trunk"/>
     <child link="1_FR_hip"/>
     <axis xyz="1 0 0"/>
